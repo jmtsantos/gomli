@@ -41,7 +41,7 @@ var (
 
 		Run: func(cmd *cobra.Command, args []string) {
 			ReadDirectory(varDirectory)
-			Replace(varScript)
+			ReplaceArray(varScript)
 		},
 	}
 )

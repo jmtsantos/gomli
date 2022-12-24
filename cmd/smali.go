@@ -8,13 +8,16 @@ import (
 )
 
 var (
+	// notations
 	RgxClassName    = regexp.MustCompile(`\.class\s(.*)`)
 	RgxFields       = regexp.MustCompile(`\.field\s+(.*)`)
 	RgxMethodsStart = regexp.MustCompile(`\.method\s+(.*)`)
 	RgxMethodsEnd   = regexp.MustCompile(`\.end method`)
 	RgxMethodName   = regexp.MustCompile(`\s+(.*)\(`)
 
+	// instructions
 	RgxInstruction0x1A = regexp.MustCompile(`(const-string) (.*), "(.*)"`)
+	RgxInstruction0x26 = regexp.MustCompile(`(fill-array-data) (.*), (.*)`)
 	RgxInstruction0x71 = regexp.MustCompile(`(invoke-static) {((?:.*,?))}, (.*)->(.*)`)
 )
 
@@ -67,6 +70,7 @@ func (s *Smali) ParseProperties() {
 	s.Properties = append(s.Properties, resultSlc...)
 }
 
+// Reads instructions inside a method
 func (s *Smali) ParseMethods() {
 
 	resultSlc := strings.Split(s.Raw, "\n")
@@ -134,6 +138,11 @@ func (s *Smali) ParseInstruction(methodName string, lineNbr int, line string) (i
 	case "const-string":
 		inst.OpCode = 0x1A
 		inst.Verbs = RgxInstruction0x1A.FindStringSubmatch(line)
+
+		// 26 fill-array-data v4, :array_a8
+	case "fill-array-data":
+		inst.OpCode = 0x26
+		inst.Verbs = RgxInstruction0x26.FindStringSubmatch(line)
 
 	// 71 invoke-static {parameters}, methodtocall
 	case "invoke-static":
